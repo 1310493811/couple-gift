@@ -1,0 +1,1567 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>情侣礼物清单（强加密版）</title>
+  <style>
+    :root{
+      --bg:#fff7f2;
+      --card: rgba(255,255,255,.88);
+      --card2: rgba(255,255,255,.72);
+      --text:#242424;
+      --muted:#6b6b6b;
+      --brand:#ff6f91;
+      --brand2:#ff9671;
+      --line: rgba(0,0,0,.08);
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --radius: 18px;
+      --ok: rgba(21,128,61,.10);
+      --warn: rgba(185,28,28,.10);
+      --okLine: rgba(21,128,61,.26);
+      --warnLine: rgba(185,28,28,.26);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      color:var(--text);
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background: linear-gradient(135deg, #ffe7ef 0%, #fff6e8 45%, #e9fbff 100%);
+    }
+    .bg img{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      opacity:0;
+      transition: opacity 1.2s ease;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .bg img.active{opacity:.65}
+    .bg::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse at top, rgba(255,255,255,.55), rgba(255,255,255,.12) 40%, rgba(255,255,255,.35));
+      backdrop-filter: blur(1px);
+    }
+
+    header{
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.65);
+      border-bottom: 1px solid var(--line);
+    }
+    .wrap{max-width:1180px; margin:0 auto; padding:16px 18px;}
+    .top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .brand{display:flex; align-items:center; gap:12px;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: var(--shadow);
+    }
+    h1{font-size:16px; margin:0}
+    .sub{font-size:12px;color:var(--muted); margin-top:2px}
+    .pill{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      background: rgba(255,255,255,.7);
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+    }
+    .pill input, .pill select{
+      border:none; outline:none; background:transparent;
+      font-size:13px;
+      padding:2px 0;
+    }
+    .pill input{min-width:120px}
+    .btn{
+      border:none; cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color:white; font-weight:700;
+      box-shadow: 0 8px 18px rgba(255,111,145,.25);
+      transition: transform .08s ease;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.secondary{
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      font-weight:600;
+    }
+    .btn.ghost{
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+      box-shadow: none;
+      font-weight:600;
+    }
+    .btn.danger{
+      background: rgba(185,28,28,.10);
+      border: 1px solid var(--warnLine);
+      color: #7f1d1d;
+      box-shadow:none;
+      font-weight:700;
+    }
+    main{padding:18px 0 60px}
+    .grid{
+      display:grid;
+      grid-template-columns: 300px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .nav{
+      position:sticky; top:84px;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:12px;
+    }
+    .nav .item{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer; user-select:none;
+      color: var(--text);
+    }
+    .nav .item:hover{background: rgba(255,255,255,.7)}
+    .nav .item.active{
+      background: linear-gradient(135deg, rgba(255,111,145,.20), rgba(255,150,113,.20));
+      border:1px solid rgba(255,111,145,.22);
+    }
+    .badge{
+      font-size:12px; color:var(--muted);
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.7);
+      white-space:nowrap;
+    }
+    .panel{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+      overflow:hidden;
+    }
+    .panel h2{margin:0 0 10px; font-size:15px}
+    .muted{color:var(--muted); font-size:13px; line-height:1.6}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .field{display:flex; flex-direction:column; gap:6px; margin:10px 0;}
+    label{font-size:12px; color:var(--muted)}
+    input, select, textarea{
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:78px; resize:vertical}
+    .split{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    @media (max-width: 780px){ .split{grid-template-columns:1fr} }
+    .hr{height:1px; background: var(--line); margin:12px 0}
+    .cardItem{
+      background: var(--card2);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding:12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.04);
+      margin-bottom:10px;
+    }
+    .titleLine{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .titleLine strong{font-size:14px}
+    .small{font-size:12px; color:var(--muted); line-height:1.6}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    a.link{color: #0b6bcb; text-decoration:none}
+    a.link:hover{text-decoration:underline}
+    .notice{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,111,145,.25);
+      background: rgba(255,111,145,.08);
+      font-size:13px;
+      line-height:1.6;
+    }
+    .ok{border:1px solid var(--okLine); background: var(--ok);}
+    .dangerBox{border:1px solid var(--warnLine); background: var(--warn);}
+    .resultCard{
+      padding:14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,111,145,.25);
+      background: linear-gradient(135deg, rgba(255,111,145,.12), rgba(255,150,113,.10));
+    }
+    .resultCard h3{margin:0 0 8px; font-size:15px}
+    .footerNote{font-size:12px; color:var(--muted); line-height:1.6}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px}
+    .overlay{
+      position:fixed; inset:0; z-index:20;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+    }
+    .modal{
+      width: min(520px, 100%);
+      background: rgba(255,255,255,.90);
+      border:1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .modal h2{margin:0 0 8px; font-size:16px}
+  </style>
+</head>
+<body>
+  <div class="bg" id="bg"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <h1>情侣礼物清单（强加密版）</h1>
+            <div class="sub">AES-256-GCM + PBKDF2 派生密钥，本地加密存储</div>
+          </div>
+        </div>
+
+        <div class="pill" title="身份切换：每个身份有独立加密仓库">
+          <span class="badge">身份</span>
+          <select id="whoSel"></select>
+          <button class="btn secondary" id="newIdBtn">新增身份</button>
+          <button class="btn secondary" id="lockBtn">锁定</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <aside class="nav">
+        <div class="item active" data-tab="wish">
+          <span>我的礼物清单</span><span class="badge" id="wishCount">0</span>
+        </div>
+        <div class="item" data-tab="holidays">
+          <span>节日与纪念日</span><span class="badge" id="holidayCount">0</span>
+        </div>
+        <div class="item" data-tab="pick">
+          <span>节日随机抽取</span><span class="badge">关键</span>
+        </div>
+        <div class="item" data-tab="bgset">
+          <span>温馨背景设置</span><span class="badge" id="bgCount">0</span>
+        </div>
+        <div class="item" data-tab="share">
+          <span>分享包（给对方抽）</span><span class="badge">加密</span>
+        </div>
+        <div class="item" data-tab="security">
+          <span>安全设置</span><span class="badge">口令</span>
+        </div>
+
+        <div class="hr"></div>
+        <div class="notice">
+          <strong>现实边界</strong><br/>
+          纯前端无服务器时，“抽取”需要导入对方的分享包。分享包可加密；抽取时只展示一条，但无法做到绝对强隔离。
+        </div>
+      </aside>
+
+      <section class="panel" id="panel">
+
+        <!-- Wishes -->
+        <div class="tab" id="tab-wish">
+          <h2>我的礼物清单</h2>
+          <div class="muted">你在这里写“你想要的东西”。数据只会以加密形式存储在本机浏览器。</div>
+          <div class="hr"></div>
+
+          <div class="split">
+            <div>
+              <div class="field">
+                <label>礼物名称</label>
+                <input id="wTitle" placeholder="例如：降噪耳机 / 篮球鞋 / 书籍" />
+              </div>
+              <div class="field">
+                <label>购买链接（可选）</label>
+                <input id="wUrl" placeholder="粘贴链接" />
+              </div>
+              <div class="split">
+                <div class="field">
+                  <label>预算下限（可选）</label>
+                  <input id="wMin" type="number" placeholder="例如 200" />
+                </div>
+                <div class="field">
+                  <label>预算上限（可选）</label>
+                  <input id="wMax" type="number" placeholder="例如 800" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="field">
+                <label>优先级</label>
+                <select id="wPriority">
+                  <option value="3">高</option>
+                  <option value="2" selected>中</option>
+                  <option value="1">低</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>分类</label>
+                <select id="wCategory">
+                  <option value="默认" selected>默认</option>
+                  <option value="数码">数码</option>
+                  <option value="穿搭">穿搭</option>
+                  <option value="护肤">护肤</option>
+                  <option value="运动">运动</option>
+                  <option value="学习">学习</option>
+                  <option value="居家">居家</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>偏好与备注（尺码/颜色/型号/禁忌）</label>
+                <textarea id="wNote" placeholder="例如：鞋码 43，颜色黑白，别买某品牌"></textarea>
+              </div>
+              <div class="field">
+                <label>可替代性</label>
+                <select id="wSubstitute">
+                  <option value="no" selected>不可替代（指定款）</option>
+                  <option value="yes">可替代（同类即可）</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn" id="addWishBtn">添加到清单</button>
+            <button class="btn secondary" id="clearWishFormBtn">清空输入</button>
+          </div>
+
+          <div class="hr"></div>
+          <div id="wishList"></div>
+        </div>
+
+        <!-- Holidays -->
+        <div class="tab" id="tab-holidays" style="display:none">
+          <h2>节日与纪念日</h2>
+          <div class="muted">用于倒计时与抽取时选择。内置节日 + 自定义纪念日。</div>
+          <div class="hr"></div>
+
+          <div class="split">
+            <div class="cardItem">
+              <strong>添加自定义节日</strong>
+              <div class="field">
+                <label>名称</label>
+                <input id="hName" placeholder="例如：我们在一起纪念日" />
+              </div>
+              <div class="field">
+                <label>日期</label>
+                <input id="hDate" type="date" />
+              </div>
+              <div class="field">
+                <label>是否每年重复</label>
+                <select id="hRepeat">
+                  <option value="yearly" selected>每年重复</option>
+                  <option value="none">仅一次</option>
+                </select>
+              </div>
+              <div class="row">
+                <button class="btn" id="addHolidayBtn">添加</button>
+                <button class="btn secondary" id="resetHolidayBtn">重置内置节日</button>
+              </div>
+            </div>
+
+            <div class="cardItem">
+              <strong>最近的节日</strong>
+              <div class="muted" id="nextHolidayText" style="margin-top:8px">暂无</div>
+              <div class="hr"></div>
+              <div class="footerNote">提示：七夕等农历节日离线无法自动换算，你可每年手动改日期。</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div id="holidayList"></div>
+        </div>
+
+        <!-- Pick -->
+        <div class="tab" id="tab-pick" style="display:none">
+          <h2>节日随机抽取（导入对方加密分享包）</h2>
+          <div class="muted">
+            对方导出分享包给你 → 你导入 → 输入分享包口令 → 选择节日抽取。抽中结果只保存在你本地。
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="split">
+            <div class="cardItem">
+              <strong>1) 导入分享包</strong>
+              <div class="field">
+                <label>选择分享包文件（.json）</label>
+                <input id="importPackFile" type="file" accept=".json,application/json" />
+              </div>
+              <div class="field">
+                <label>分享包口令（由对方提供）</label>
+                <input id="packPass" type="password" placeholder="输入口令以解密并抽取" />
+              </div>
+              <div class="row">
+                <button class="btn secondary" id="clearImportedPackBtn">清除已导入</button>
+              </div>
+              <div class="hr"></div>
+              <div class="notice" id="importStatus">尚未导入分享包。</div>
+            </div>
+
+            <div class="cardItem">
+              <strong>2) 选择节日并抽取</strong>
+              <div class="field">
+                <label>选择节日</label>
+                <select id="pickHoliday"></select>
+              </div>
+              <div class="field">
+                <label>抽取策略</label>
+                <select id="pickStrategy">
+                  <option value="any" selected>完全随机（可重复）</option>
+                  <option value="excludeUsed">排除本节日已抽过的（推荐）</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>仅允许节日当天抽取</label>
+                <select id="pickDayLock">
+                  <option value="off" selected>不限制</option>
+                  <option value="on">仅节日当天</option>
+                </select>
+              </div>
+              <div class="row">
+                <button class="btn" id="doPickBtn">开始抽取</button>
+                <button class="btn secondary" id="pickAgainBtn" disabled>再抽一次</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div id="pickResultArea"></div>
+
+          <div class="hr"></div>
+          <div class="cardItem">
+            <strong>本地“预定/已买”（仅你可见）</strong>
+            <div class="muted">你可以把抽中的条目标记为“已预定/已买”，避免你自己重复买。</div>
+            <div id="reserveList"></div>
+          </div>
+        </div>
+
+        <!-- Background -->
+        <div class="tab" id="tab-bgset" style="display:none">
+          <h2>温馨背景设置（幻灯片）</h2>
+          <div class="muted">
+            背景图片存储在本机浏览器。过大或过多图片可能存不下，建议每张压缩到 0.3~1MB。
+          </div>
+
+          <div class="hr"></div>
+          <div class="split">
+            <div class="cardItem">
+              <strong>上传背景图片</strong>
+              <div class="field">
+                <label>选择图片（可多选）</label>
+                <input id="bgFiles" type="file" accept="image/*" multiple />
+              </div>
+              <div class="field">
+                <label>轮播间隔（秒）</label>
+                <input id="bgInterval" type="number" min="2" max="60" value="7" />
+              </div>
+              <div class="row">
+                <button class="btn" id="applyBgBtn">应用设置</button>
+                <button class="btn secondary" id="clearBgBtn">清空背景</button>
+              </div>
+              <div class="hr"></div>
+              <div class="footerNote">提示：如果你希望“你们两个人在同一台电脑看同一套背景”，那就用同一个浏览器。</div>
+            </div>
+            <div class="cardItem">
+              <strong>当前背景预览列表</strong>
+              <div class="muted" id="bgListText" style="margin-top:8px">暂无背景图片</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share -->
+        <div class="tab" id="tab-share" style="display:none">
+          <h2>分享包（强加密）</h2>
+          <div class="muted">
+            你可以导出“加密分享包”发给对方。对方只有输入正确口令才能解密并抽取。
+          </div>
+
+          <div class="hr"></div>
+          <div class="cardItem">
+            <strong>导出分享包</strong>
+            <div class="field">
+              <label>分享包口令（你设置，发给对方）</label>
+              <input id="exportPass" type="password" placeholder="建议：与你的登录口令不同，且避免过短" />
+            </div>
+            <div class="row">
+              <button class="btn" id="exportPackBtn">导出加密分享包（完整字段）</button>
+              <button class="btn secondary" id="exportLiteBtn">导出加密轻量包（无备注）</button>
+            </div>
+            <div class="hr"></div>
+            <div class="notice dangerBox">
+              安全提示：离线纯前端只能做到“加密存储 + 控制界面展示”。如果你们真的很在意对方永远不可能看到列表，就上后端把“随机抽取”放到服务器做。
+            </div>
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div class="tab" id="tab-security" style="display:none">
+          <h2>安全设置</h2>
+          <div class="muted">
+            当前数据仓库是加密的。你可以修改当前身份的登录口令、设置自动锁定时间、或导出/清空本地数据。
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="split">
+            <div class="cardItem">
+              <strong>修改登录口令（当前身份）</strong>
+              <div class="field">
+                <label>当前口令</label>
+                <input id="oldPass" type="password" placeholder="输入当前口令" />
+              </div>
+              <div class="field">
+                <label>新口令</label>
+                <input id="newPass" type="password" placeholder="建议 10+ 字符，包含数字与符号" />
+              </div>
+              <div class="row">
+                <button class="btn" id="changePassBtn">修改口令并重加密</button>
+              </div>
+            </div>
+
+            <div class="cardItem">
+              <strong>自动锁定</strong>
+              <div class="field">
+                <label>无操作自动锁定（分钟）</label>
+                <input id="autoLockMin" type="number" min="1" max="120" value="10" />
+              </div>
+              <div class="row">
+                <button class="btn secondary" id="applyAutoLockBtn">应用</button>
+              </div>
+              <div class="hr"></div>
+              <div class="footerNote">
+                强烈建议开启。锁定后需要重新输入口令才能解密。
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="cardItem">
+            <strong>危险操作</strong>
+            <div class="muted">以下操作不可逆。</div>
+            <div class="row" style="margin-top:10px">
+              <button class="btn danger" id="wipeCurrentBtn">清空当前身份数据</button>
+              <button class="btn danger" id="wipeAllBtn">清空全部身份数据</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Unlock overlay -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2>解锁加密仓库</h2>
+      <div class="muted" id="overlayDesc">
+        请选择身份并输入口令解锁。口令不会上传到任何服务器。
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="field">
+        <label>身份</label>
+        <select id="overlayWho"></select>
+      </div>
+      <div class="field">
+        <label>登录口令</label>
+        <input id="overlayPass" type="password" placeholder="输入口令以解密" />
+      </div>
+
+      <div class="row">
+        <button class="btn" id="unlockBtn">解锁</button>
+        <button class="btn secondary" id="createIdInOverlayBtn">新增身份</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="notice" id="unlockStatus">提示：如果你忘了口令，本地数据无法恢复。</div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   Strong encryption version
+   - AES-256-GCM
+   - Key derived from PBKDF2 SHA-256, 310k iterations
+   - Encrypted per identity in localStorage
+   - Background stored in localStorage (base64, limited)
+   ========================= */
+
+const $ = (id)=>document.getElementById(id);
+const KEY_PREFIX = "coupleGiftSecure.v1.";
+const KEY_IDS = KEY_PREFIX + "ids";          // ["我","她"]
+const KEY_ENC = (id)=> KEY_PREFIX + "enc." + id; // {salt, iv, ct}
+const KEY_CFG = KEY_PREFIX + "cfg";          // {autoLockMin}
+const BG_KEY = KEY_PREFIX + "bg";            // {intervalSec, images:[]}
+
+const DEFAULT_HOLIDAYS = [
+  {name:"情人节",  date:"02-14", repeat:"yearly"},
+  {name:"七夕（手动改）", date:"08-10", repeat:"yearly"},
+  {name:"圣诞节",  date:"12-25", repeat:"yearly"},
+  {name:"生日（你填）", date:"01-01", repeat:"yearly"},
+  {name:"生日（她填）", date:"01-01", repeat:"yearly"},
+];
+
+const state = {
+  unlocked: false,
+  who: "",
+  pass: "",
+  data: null,
+  importedPack: null, // decrypted items in memory only
+  activeTab: "wish",
+  bgTimer: null,
+  lastActivity: Date.now(),
+  autoLockMin: 10,
+};
+
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function nowYMD(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function ymdToDate(ymd){
+  const [y,m,d] = ymd.split("-").map(Number);
+  return new Date(y, m-1, d);
+}
+function daysBetween(a,b){
+  const ms = 24*60*60*1000;
+  return Math.floor((b.getTime()-a.getTime())/ms);
+}
+function cryptoRandomBytes(n){
+  const b = new Uint8Array(n);
+  crypto.getRandomValues(b);
+  return b;
+}
+function b64encode(bytes){
+  let bin = "";
+  bytes.forEach(b=> bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function b64decode(str){
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+function textToBytes(s){ return new TextEncoder().encode(s); }
+function bytesToText(b){ return new TextDecoder().decode(b); }
+
+async function deriveKey(pass, saltBytes){
+  const baseKey = await crypto.subtle.importKey(
+    "raw",
+    textToBytes(pass),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name:"PBKDF2", salt: saltBytes, iterations: 310000, hash:"SHA-256" },
+    baseKey,
+    { name:"AES-GCM", length: 256 },
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+async function encryptJson(pass, obj){
+  const salt = cryptoRandomBytes(16);
+  const iv = cryptoRandomBytes(12);
+  const key = await deriveKey(pass, salt);
+  const pt = textToBytes(JSON.stringify(obj));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, pt));
+  return { salt: b64encode(salt), iv: b64encode(iv), ct: b64encode(ct) };
+}
+async function decryptJson(pass, enc){
+  const salt = b64decode(enc.salt);
+  const iv = b64decode(enc.iv);
+  const ct = b64decode(enc.ct);
+  const key = await deriveKey(pass, salt);
+  const ptBuf = await crypto.subtle.decrypt({name:"AES-GCM", iv}, key, ct);
+  return JSON.parse(bytesToText(new Uint8Array(ptBuf)));
+}
+
+function loadIds(){
+  const raw = localStorage.getItem(KEY_IDS);
+  if(!raw) return [];
+  try{ return JSON.parse(raw) }catch{ return [] }
+}
+function saveIds(ids){
+  localStorage.setItem(KEY_IDS, JSON.stringify(ids));
+}
+function loadCfg(){
+  const raw = localStorage.getItem(KEY_CFG);
+  if(!raw) return {autoLockMin: 10};
+  try{ return JSON.parse(raw) }catch{ return {autoLockMin:10} }
+}
+function saveCfg(cfg){
+  localStorage.setItem(KEY_CFG, JSON.stringify(cfg));
+}
+
+function buildDefaultData(idName){
+  const y = new Date().getFullYear();
+  const holidays = DEFAULT_HOLIDAYS.map((h,i)=>({
+    id: "def_"+i,
+    name: h.name,
+    date: `${y}-${h.date}`,
+    repeat: h.repeat,
+    createdBy: "system",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  }));
+  return {
+    profile: { name: idName, createdAt: Date.now() },
+    wishes: [],
+    holidays,
+    picks: [],     // {holidayKey, pickedHash, pickedTitle, time}
+    reserves: [],  // {pickedHash, title, status:"reserved"|"bought", time}
+  };
+}
+
+function setTab(tab){
+  state.activeTab = tab;
+  document.querySelectorAll(".nav .item").forEach(el=>{
+    el.classList.toggle("active", el.dataset.tab===tab);
+  });
+  document.querySelectorAll(".tab").forEach(el=>el.style.display="none");
+  $("tab-"+tab).style.display = "block";
+}
+
+function updateCounts(){
+  $("wishCount").textContent = String(state.data?.wishes?.length || 0);
+  $("holidayCount").textContent = String(state.data?.holidays?.length || 0);
+  const bg = loadBg();
+  $("bgCount").textContent = String(bg.images?.length || 0);
+}
+
+function hashLite(obj){
+  const s = JSON.stringify(obj);
+  let h = 2166136261;
+  for(let i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return String(h >>> 0);
+}
+
+function renderWishes(){
+  const container = $("wishList");
+  const list = state.data?.wishes || [];
+  if(!list.length){
+    container.innerHTML = `<div class="notice">当前还没有礼物条目。建议先加 5~10 个。</div>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=> (b.priority-a.priority) || (b.updatedAt-a.updatedAt));
+  container.innerHTML = sorted.map(item=>{
+    const pri = item.priority===3?"高":item.priority===2?"中":"低";
+    const price = (item.min!=null || item.max!=null) ? `${item.min ?? ""} ~ ${item.max ?? ""}`.trim() : "未填写";
+    const sub = item.substitute==="yes" ? "可替代" : "不可替代";
+    const urlLine = item.url ? `<a class="link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">打开链接</a>` : `<span class="small">无链接</span>`;
+    return `
+      <div class="cardItem">
+        <div class="titleLine">
+          <div>
+            <strong>${escapeHtml(item.title)}</strong>
+            <div class="small">分类：${escapeHtml(item.category||"默认")} ｜ 优先级：${pri} ｜ 预算：${escapeHtml(price)} ｜ ${sub}</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-act="edit" data-id="${item.id}">编辑</button>
+            <button class="btn ghost" data-act="del" data-id="${item.id}">删除</button>
+          </div>
+        </div>
+        <div style="margin-top:8px">${urlLine}</div>
+        ${item.note ? `<div class="small" style="margin-top:8px">备注：${escapeHtml(item.note)}</div>`:""}
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const act = btn.dataset.act;
+      const id = btn.dataset.id;
+      if(act==="del") deleteWish(id);
+      if(act==="edit") editWish(id);
+    });
+  });
+}
+
+function renderHolidays(){
+  const container = $("holidayList");
+  const list = state.data?.holidays || [];
+  if(!list.length){
+    container.innerHTML = `<div class="notice">没有节日。你可以点击“重置内置节日”。</div>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=> ymdToDate(a.date) - ymdToDate(b.date));
+  container.innerHTML = sorted.map(h=>{
+    const rep = h.repeat==="yearly" ? "每年重复" : "仅一次";
+    return `
+      <div class="cardItem">
+        <div class="titleLine">
+          <div>
+            <strong>${escapeHtml(h.name)}</strong>
+            <div class="small">日期：${escapeHtml(h.date)} ｜ ${rep}</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-hact="edit" data-id="${h.id}">编辑</button>
+            <button class="btn ghost" data-hact="del" data-id="${h.id}">删除</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("button[data-hact]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const act = btn.dataset.hact;
+      const id = btn.dataset.id;
+      if(act==="del") deleteHoliday(id);
+      if(act==="edit") editHoliday(id);
+    });
+  });
+}
+
+function refreshPickHolidaySelect(){
+  const sel = $("pickHoliday");
+  sel.innerHTML = "";
+  const list = state.data?.holidays || [];
+  if(!list.length){
+    sel.innerHTML = `<option value="">（暂无节日）</option>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=> ymdToDate(a.date) - ymdToDate(b.date));
+  for(const h of sorted){
+    const opt = document.createElement("option");
+    opt.value = h.id;
+    opt.textContent = `${h.name}（${h.date}）`;
+    sel.appendChild(opt);
+  }
+}
+
+function updateNextHoliday(){
+  const list = state.data?.holidays || [];
+  if(!list.length){ $("nextHolidayText").textContent = "暂无"; return; }
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const candidates = list.map(h=>{
+    let d = ymdToDate(h.date);
+    if(h.repeat==="yearly" && d < today){
+      d = new Date(d.getFullYear()+1, d.getMonth(), d.getDate());
+    }
+    return {h, d};
+  }).sort((a,b)=> a.d - b.d);
+  const next = candidates[0];
+  $("nextHolidayText").textContent = `${next.h.name}：${fmtDate(next.d)}（还剩 ${daysBetween(today, next.d)} 天）`;
+}
+function fmtDate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function clearWishForm(){
+  $("wTitle").value="";
+  $("wUrl").value="";
+  $("wMin").value="";
+  $("wMax").value="";
+  $("wPriority").value="2";
+  $("wCategory").value="默认";
+  $("wNote").value="";
+  $("wSubstitute").value="no";
+}
+
+function addWish(){
+  const title = $("wTitle").value.trim();
+  if(!title){ alert("礼物名称不能为空"); return; }
+  const item = {
+    id: "w_" + cryptoId(),
+    title,
+    url: $("wUrl").value.trim(),
+    min: numOrNull($("wMin").value),
+    max: numOrNull($("wMax").value),
+    priority: Number($("wPriority").value),
+    category: $("wCategory").value,
+    note: $("wNote").value.trim(),
+    substitute: $("wSubstitute").value,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  state.data.wishes.push(item);
+  clearWishForm();
+  persist();
+  renderAll();
+}
+function deleteWish(id){
+  if(!confirm("确定删除这个礼物条目吗？")) return;
+  state.data.wishes = state.data.wishes.filter(x=>x.id!==id);
+  persist();
+  renderAll();
+}
+function editWish(id){
+  const it = state.data.wishes.find(x=>x.id===id);
+  if(!it) return;
+  $("wTitle").value = it.title;
+  $("wUrl").value = it.url || "";
+  $("wMin").value = it.min ?? "";
+  $("wMax").value = it.max ?? "";
+  $("wPriority").value = String(it.priority ?? 2);
+  $("wCategory").value = it.category || "默认";
+  $("wNote").value = it.note || "";
+  $("wSubstitute").value = it.substitute || "no";
+  state.data.wishes = state.data.wishes.filter(x=>x.id!==id);
+  persist();
+  renderAll();
+}
+
+function addHoliday(){
+  const name = $("hName").value.trim();
+  const date = $("hDate").value;
+  if(!name || !date){ alert("名称和日期都不能为空"); return; }
+  const h = {
+    id: "h_" + cryptoId(),
+    name, date,
+    repeat: $("hRepeat").value,
+    createdBy: state.who,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  state.data.holidays.push(h);
+  $("hName").value="";
+  $("hDate").value=nowYMD();
+  persist();
+  renderAll();
+}
+function deleteHoliday(id){
+  if(!confirm("确定删除这个节日吗？")) return;
+  state.data.holidays = state.data.holidays.filter(x=>x.id!==id);
+  persist();
+  renderAll();
+}
+function editHoliday(id){
+  const h = state.data.holidays.find(x=>x.id===id);
+  if(!h) return;
+  const newName = prompt("修改名称：", h.name);
+  if(newName==null) return;
+  const newDate = prompt("修改日期（YYYY-MM-DD）：", h.date);
+  if(newDate==null) return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())){ alert("日期格式不正确"); return; }
+  h.name = newName.trim() || h.name;
+  h.date = newDate.trim();
+  h.updatedAt = Date.now();
+  persist();
+  renderAll();
+}
+function resetHolidays(){
+  if(!confirm("将节日重置为内置默认项，并保留你自定义的节日吗？")) return;
+  const customs = (state.data.holidays||[]).filter(h=>!String(h.id).startsWith("def_"));
+  const y = new Date().getFullYear();
+  const defaults = DEFAULT_HOLIDAYS.map((h,i)=>({
+    id: "def_"+i,
+    name:h.name,
+    date:`${y}-${h.date}`,
+    repeat:h.repeat,
+    createdBy:"system",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  }));
+  state.data.holidays = defaults.concat(customs);
+  persist();
+  renderAll();
+}
+
+function renderReserves(){
+  const el = $("reserveList");
+  const list = state.data?.reserves || [];
+  if(!list.length){
+    el.innerHTML = `<div class="notice">暂无预定/已买记录。</div>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=> b.time-a.time);
+  el.innerHTML = sorted.map(r=>{
+    const st = r.status==="bought" ? "已买" : "已预定";
+    return `
+      <div class="cardItem">
+        <div class="titleLine">
+          <div>
+            <strong>${escapeHtml(r.title)}</strong>
+            <div class="small">状态：${st} ｜ 时间：${new Date(r.time).toLocaleString()}</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-ract="toggle" data-h="${escapeHtml(r.pickedHash)}">${r.status==="bought"?"改为预定":"改为已买"}</button>
+            <button class="btn ghost" data-ract="del" data-h="${escapeHtml(r.pickedHash)}">删除</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  el.querySelectorAll("button[data-ract]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const act = btn.dataset.ract;
+      const h = btn.dataset.h;
+      if(act==="del"){
+        state.data.reserves = state.data.reserves.filter(x=>x.pickedHash!==h);
+      }else if(act==="toggle"){
+        const it = state.data.reserves.find(x=>x.pickedHash===h);
+        if(it) it.status = (it.status==="bought"?"reserved":"bought");
+      }
+      persist();
+      renderReserves();
+    });
+  });
+}
+
+function clearImportedPack(){
+  state.importedPack = null;
+  $("importPackFile").value = "";
+  $("packPass").value = "";
+  $("importStatus").className = "notice";
+  $("importStatus").textContent = "尚未导入分享包。";
+  $("pickResultArea").innerHTML = "";
+  $("pickAgainBtn").disabled = true;
+}
+
+async function importPackFromFile(file, pass){
+  const text = await file.text();
+  const obj = JSON.parse(text);
+  if(!obj || obj.type!=="couple-gift-pack.secure.v1") throw new Error("格式不正确");
+  // decrypt payload
+  const payload = await decryptJson(pass, obj.enc);
+  if(!payload || !Array.isArray(payload.items)) throw new Error("解密失败或内容损坏");
+  state.importedPack = { ownerName: obj.ownerName, items: payload.items, lite: obj.lite===true };
+  $("importStatus").className = "notice ok";
+  $("importStatus").textContent = `已导入并解密：来自「${obj.ownerName||"对方"}」，条目数 ${payload.items.length}。`;
+}
+
+function renderPickResult(picked, holiday, strategy){
+  const title = picked.title || picked.name || "（未命名）";
+  const price = (picked.min!=null || picked.max!=null)
+    ? `${picked.min ?? ""} ~ ${picked.max ?? ""}`.trim()
+    : (picked.priceRange || "未填写");
+  const url = picked.url || "";
+  const note = picked.note || "";
+  const cat = picked.category || "默认";
+  const pickedHash = hashLite(picked);
+
+  $("pickResultArea").innerHTML = `
+    <div class="resultCard">
+      <h3>抽取结果：${escapeHtml(holiday.name)}（${escapeHtml(holiday.date)}）</h3>
+      <div class="small">策略：${strategy==="excludeUsed" ? "排除已抽" : "完全随机"}</div>
+      <div class="hr"></div>
+      <div style="font-size:16px"><strong>${escapeHtml(title)}</strong></div>
+      <div class="small" style="margin-top:6px">分类：${escapeHtml(cat)} ｜ 预算：${escapeHtml(price)}</div>
+      ${url ? `<div style="margin-top:10px"><a class="link" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">打开购买链接</a></div>` : ""}
+      ${note ? `<div class="small" style="margin-top:10px">备注：${escapeHtml(note)}</div>` : ""}
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn secondary" id="markReservedBtn">标记：已预定</button>
+        <button class="btn secondary" id="markBoughtBtn">标记：已买</button>
+      </div>
+      <div class="footerNote" style="margin-top:10px">标记仅保存在你当前身份的本地加密仓库，用于避免你自己重复买。</div>
+    </div>
+  `;
+
+  $("markReservedBtn").addEventListener("click", ()=>{
+    upsertReserve(pickedHash, title, "reserved");
+  });
+  $("markBoughtBtn").addEventListener("click", ()=>{
+    upsertReserve(pickedHash, title, "bought");
+  });
+}
+
+function upsertReserve(pickedHash, title, status){
+  const list = state.data.reserves || (state.data.reserves = []);
+  const it = list.find(x=>x.pickedHash===pickedHash);
+  if(it){
+    it.status = status;
+    it.time = Date.now();
+  }else{
+    list.push({pickedHash, title, status, time: Date.now()});
+  }
+  persist();
+  renderReserves();
+  alert("已记录在本地（加密存储）。");
+}
+
+function doPick(){
+  if(!state.importedPack){ alert("请先导入并解密对方分享包"); return; }
+  const holidayId = $("pickHoliday").value;
+  const holiday = (state.data.holidays||[]).find(h=>h.id===holidayId);
+  if(!holiday){ alert("请选择节日"); return; }
+
+  const dayLock = $("pickDayLock").value;
+  if(dayLock==="on"){
+    const today = nowYMD();
+    if(today !== holiday.date){
+      alert(`已开启“仅节日当天抽取”。今天是 ${today}，所选节日是 ${holiday.date}。`);
+      return;
+    }
+  }
+
+  const items = state.importedPack.items || [];
+  if(!items.length){ alert("对方分享包里没有礼物条目"); return; }
+
+  const holidayKey = holiday.id + "|" + holiday.date;
+  const strategy = $("pickStrategy").value;
+
+  let pool = items;
+  if(strategy==="excludeUsed"){
+    const used = new Set((state.data.picks||[]).filter(p=>p.holidayKey===holidayKey).map(p=>p.pickedHash));
+    pool = items.filter(it=> !used.has(hashLite(it)));
+    if(!pool.length){
+      alert("该节日可抽取条目已抽完或条目太少。切换为“完全随机”或让对方更新分享包。");
+      return;
+    }
+  }
+
+  const picked = pool[Math.floor(Math.random()*pool.length)];
+  const rec = {
+    holidayKey,
+    holidayName: holiday.name,
+    holidayDate: holiday.date,
+    pickedTitle: picked.title || picked.name || "（未命名）",
+    pickedHash: hashLite(picked),
+    time: Date.now(),
+  };
+  state.data.picks.push(rec);
+  persist();
+
+  renderPickResult(picked, holiday, strategy);
+  $("pickAgainBtn").disabled = false;
+  renderReserves();
+}
+
+/* ===== Background ===== */
+function loadBg(){
+  const raw = localStorage.getItem(BG_KEY);
+  if(!raw) return {intervalSec:7, images:[]};
+  try{ return JSON.parse(raw) }catch{ return {intervalSec:7, images:[]} }
+}
+function saveBg(bg){ localStorage.setItem(BG_KEY, JSON.stringify(bg)); }
+
+async function filesToBase64(files){
+  const arr = [];
+  for(const f of files){
+    const b64 = await new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    arr.push(b64);
+  }
+  return arr;
+}
+async function addBackgroundImages(files){
+  const bg = loadBg();
+  const b64s = await filesToBase64(files);
+  bg.images = (bg.images||[]).concat(b64s);
+  saveBg(bg);
+  applyBackground();
+}
+function clearBackground(){
+  saveBg({intervalSec:7, images:[]});
+  applyBackground();
+}
+function applyBackground(){
+  const bg = loadBg();
+  $("bgInterval").value = bg.intervalSec ?? 7;
+  $("bgCount").textContent = String(bg.images?.length || 0);
+
+  const bgDiv = $("bg");
+  bgDiv.innerHTML = "";
+  const imgs = (bg.images||[]).map(src=>{
+    const im = document.createElement("img");
+    im.src = src;
+    bgDiv.appendChild(im);
+    return im;
+  });
+  $("bgListText").textContent = imgs.length ? `已保存 ${imgs.length} 张背景图片。` : "暂无背景图片";
+
+  if(state.bgTimer) clearInterval(state.bgTimer);
+  if(!imgs.length) return;
+
+  let idx = 0;
+  imgs[0].classList.add("active");
+  state.bgTimer = setInterval(()=>{
+    imgs[idx].classList.remove("active");
+    idx = (idx + 1) % imgs.length;
+    imgs[idx].classList.add("active");
+  }, (bg.intervalSec || 7) * 1000);
+}
+
+/* ===== Persistence (encrypt on save) ===== */
+async function persist(){
+  // encrypt and store
+  if(!state.unlocked || !state.who || !state.pass || !state.data) return;
+  const enc = await encryptJson(state.pass, state.data);
+  localStorage.setItem(KEY_ENC(state.who), JSON.stringify(enc));
+  updateCounts();
+}
+
+function renderAll(){
+  renderWishes();
+  renderHolidays();
+  refreshPickHolidaySelect();
+  updateCounts();
+  updateNextHoliday();
+  renderReserves();
+}
+
+/* ===== Identity & unlock ===== */
+function fillWhoSelects(ids){
+  const selTop = $("whoSel");
+  const selOverlay = $("overlayWho");
+  selTop.innerHTML = "";
+  selOverlay.innerHTML = "";
+  for(const id of ids){
+    const o1 = document.createElement("option"); o1.value = id; o1.textContent = id;
+    const o2 = document.createElement("option"); o2.value = id; o2.textContent = id;
+    selTop.appendChild(o1);
+    selOverlay.appendChild(o2);
+  }
+}
+function ensureAtLeastOneId(){
+  let ids = loadIds();
+  if(ids.length===0){
+    ids = ["我", "女朋友"];
+    saveIds(ids);
+  }
+  return ids;
+}
+
+async function unlockIdentity(id, pass){
+  const status = $("unlockStatus");
+  status.className = "notice";
+  status.textContent = "正在解密，请稍候……";
+
+  try{
+    const raw = localStorage.getItem(KEY_ENC(id));
+    let data;
+    if(!raw){
+      // first time: create and encrypt
+      data = buildDefaultData(id);
+      state.who = id;
+      state.pass = pass;
+      state.data = data;
+      state.unlocked = true;
+      await persist();
+    }else{
+      const enc = JSON.parse(raw);
+      data = await decryptJson(pass, enc);
+      state.who = id;
+      state.pass = pass;
+      state.data = data;
+      state.unlocked = true;
+    }
+
+    // update UI
+    $("whoSel").value = id;
+    hideOverlay();
+    renderAll();
+    setTab("wish");
+    resetActivity();
+  }catch(e){
+    status.className = "notice dangerBox";
+    status.textContent = "解锁失败：口令错误或数据损坏。";
+  }
+}
+
+function lock(){
+  state.unlocked = false;
+  state.pass = "";
+  state.data = null;
+  state.importedPack = null;
+  showOverlay("已锁定。请输入口令解锁。");
+}
+
+function showOverlay(desc){
+  $("overlay").style.display = "flex";
+  $("overlayDesc").textContent = desc || "请选择身份并输入口令解锁。口令不会上传到任何服务器。";
+  $("overlayPass").value = "";
+  $("unlockStatus").className = "notice";
+  $("unlockStatus").textContent = "提示：如果你忘了口令，本地数据无法恢复。";
+}
+function hideOverlay(){
+  $("overlay").style.display = "none";
+}
+
+function addIdentityFlow(){
+  const name = prompt("输入新身份名称（例如：曹超越 / 朱培渤）：");
+  if(!name) return;
+  const id = name.trim();
+  if(!id) return;
+
+  const ids = loadIds();
+  if(ids.includes(id)){
+    alert("该身份已存在。");
+    return;
+  }
+  ids.push(id);
+  saveIds(ids);
+  fillWhoSelects(ids);
+  $("whoSel").value = id;
+  $("overlayWho").value = id;
+  alert("已新增身份。请为该身份设置口令并解锁。");
+}
+
+async function switchIdentity(id){
+  if(!state.unlocked){
+    showOverlay("请先解锁后再切换身份。");
+    return;
+  }
+  // lock current in memory, require re-enter pass for new identity (安全上更清晰)
+  lock();
+  $("overlayWho").value = id;
+  $("overlayDesc").textContent = "已切换身份。请输入该身份口令解锁。";
+}
+
+async function changePassword(){
+  const oldP = $("oldPass").value;
+  const newP = $("newPass").value;
+  if(!oldP || !newP){ alert("请填写当前口令和新口令。"); return; }
+  if(newP.length < 8){ alert("新口令至少 8 位，建议 10+ 且包含数字符号。"); return; }
+
+  // verify old by decrypting fresh
+  try{
+    const raw = localStorage.getItem(KEY_ENC(state.who));
+    const enc = JSON.parse(raw);
+    const data = await decryptJson(oldP, enc);
+
+    // re-encrypt with new
+    const newEnc = await encryptJson(newP, data);
+    localStorage.setItem(KEY_ENC(state.who), JSON.stringify(newEnc));
+
+    // update state
+    state.pass = newP;
+    state.data = data;
+    $("oldPass").value = "";
+    $("newPass").value = "";
+    alert("口令已修改并完成重加密。");
+    resetActivity();
+  }catch(e){
+    alert("修改失败：当前口令不正确或数据损坏。");
+  }
+}
+
+function wipeCurrent(){
+  if(!confirm("确定清空当前身份全部数据？不可恢复。")) return;
+  localStorage.removeItem(KEY_ENC(state.who));
+  // rebuild
+  state.data = buildDefaultData(state.who);
+  persist().then(()=>{ renderAll(); alert("已清空并重建当前身份数据。"); });
+}
+function wipeAll(){
+  if(!confirm("确定清空全部身份数据？不可恢复。")) return;
+  const ids = loadIds();
+  for(const id of ids) localStorage.removeItem(KEY_ENC(id));
+  // keep ids list but data wiped
+  lock();
+  alert("已清空全部身份数据。请重新解锁创建。");
+}
+
+/* ===== Share pack (encrypted) ===== */
+async function exportPack(lite=false){
+  const pass = $("exportPass").value;
+  if(!pass || pass.length < 8){ alert("请设置分享包口令（至少 8 位）。"); return; }
+
+  const items = (state.data.wishes||[]).map(w=>{
+    if(!lite) return w;
+    return {
+      title: w.title,
+      min: w.min,
+      max: w.max,
+      priceRange: (w.min!=null || w.max!=null) ? `${w.min ?? ""} ~ ${w.max ?? ""}`.trim() : "",
+      url: w.url || "",
+      category: w.category || "默认",
+      substitute: w.substitute || "no",
+      // note removed
+    };
+  });
+
+  const payload = { items };
+  const enc = await encryptJson(pass, payload);
+
+  const pack = {
+    type: "couple-gift-pack.secure.v1",
+    ownerName: state.who,
+    lite,
+    createdAt: new Date().toISOString(),
+    enc
+  };
+
+  const blob = new Blob([JSON.stringify(pack, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `分享包_${state.who}_${new Date().toISOString().slice(0,10)}${lite?"_lite":""}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  alert("分享包已导出。请把口令单独发给对方（不要和文件放同一条消息）。");
+}
+
+/* ===== Activity & auto lock ===== */
+function resetActivity(){
+  state.lastActivity = Date.now();
+}
+function applyAutoLock(){
+  const v = Number($("autoLockMin").value);
+  if(!Number.isFinite(v) || v<1 || v>120){ alert("请输入 1~120 的分钟数"); return; }
+  state.autoLockMin = v;
+  saveCfg({autoLockMin:v});
+  alert("已应用自动锁定。");
+  resetActivity();
+}
+function startAutoLockWatcher(){
+  setInterval(()=>{
+    if(!state.unlocked) return;
+    const idleMs = Date.now() - state.lastActivity;
+    if(idleMs > state.autoLockMin * 60 * 1000){
+      lock();
+    }
+  }, 2000);
+}
+["click","keydown","mousemove","touchstart","scroll"].forEach(ev=>{
+  window.addEventListener(ev, ()=> resetActivity(), {passive:true});
+});
+
+/* ===== Helpers ===== */
+function cryptoId(){
+  const b = cryptoRandomBytes(8);
+  return Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function numOrNull(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+/* ===== Events ===== */
+document.querySelectorAll(".nav .item").forEach(el=>{
+  el.addEventListener("click", ()=> setTab(el.dataset.tab));
+});
+
+$("newIdBtn").addEventListener("click", addIdentityFlow);
+$("createIdInOverlayBtn").addEventListener("click", addIdentityFlow);
+
+$("unlockBtn").addEventListener("click", ()=>{
+  const id = $("overlayWho").value;
+  const pass = $("overlayPass").value;
+  if(!id || !pass){ return; }
+  unlockIdentity(id, pass);
+});
+
+$("lockBtn").addEventListener("click", lock);
+
+$("whoSel").addEventListener("change", (e)=>{
+  const id = e.target.value;
+  switchIdentity(id);
+});
+
+$("addWishBtn").addEventListener("click", addWish);
+$("clearWishFormBtn").addEventListener("click", clearWishForm);
+
+$("addHolidayBtn").addEventListener("click", addHoliday);
+$("resetHolidayBtn").addEventListener("click", resetHolidays);
+
+$("importPackFile").addEventListener("change", async (e)=>{
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const pass = $("packPass").value;
+  if(!pass){ alert("请输入分享包口令再导入"); e.target.value=""; return; }
+  try{
+    await importPackFromFile(file, pass);
+  }catch(err){
+    $("importStatus").className = "notice dangerBox";
+    $("importStatus").textContent = "导入失败：口令错误或文件损坏/格式不对。";
+    state.importedPack = null;
+  }
+});
+
+$("clearImportedPackBtn").addEventListener("click", clearImportedPack);
+
+$("doPickBtn").addEventListener("click", doPick);
+$("pickAgainBtn").addEventListener("click", doPick);
+
+$("exportPackBtn").addEventListener("click", ()=> exportPack(false));
+$("exportLiteBtn").addEventListener("click", ()=> exportPack(true));
+
+$("bgFiles").addEventListener("change", async (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  await addBackgroundImages(files);
+  e.target.value = "";
+});
+
+$("applyBgBtn").addEventListener("click", ()=>{
+  const bg = loadBg();
+  const v = Number($("bgInterval").value);
+  bg.intervalSec = (Number.isFinite(v) && v>=2 && v<=60) ? v : 7;
+  saveBg(bg);
+  applyBackground();
+});
+
+$("clearBgBtn").addEventListener("click", clearBackground);
+
+$("changePassBtn").addEventListener("click", changePassword);
+$("applyAutoLockBtn").addEventListener("click", applyAutoLock);
+$("wipeCurrentBtn").addEventListener("click", wipeCurrent);
+$("wipeAllBtn").addEventListener("click", wipeAll);
+
+/* ===== Init ===== */
+(function init(){
+  // cfg
+  const cfg = loadCfg();
+  state.autoLockMin = cfg.autoLockMin ?? 10;
+  $("autoLockMin").value = state.autoLockMin;
+
+  // identities
+  const ids = ensureAtLeastOneId();
+  fillWhoSelects(ids);
+  $("whoSel").value = ids[0];
+  $("overlayWho").value = ids[0];
+
+  // bg
+  applyBackground();
+
+  // defaults
+  $("hDate").value = nowYMD();
+
+  // show overlay
+  showOverlay("请选择身份并输入口令解锁。首次使用某身份：输入口令即可创建加密仓库。");
+  startAutoLockWatcher();
+})();
+</script>
+</body>
+</html>
